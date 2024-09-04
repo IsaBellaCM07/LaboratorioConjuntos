@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+from matplotlib_venn import venn2, venn3
+
 class Conjunto:
     def __init__(self, conjunto, nombre=""):
         """
@@ -111,7 +114,6 @@ class Conjunto:
             resultados.append((conjunto_adicional.nombre, es_super))
         return resultados
 
-
 # Solicitar la cantidad de conjuntos
 while True:
     num_conjuntos = int(input("¿Cuántos conjuntos desea ingresar? (mínimo 2, máximo 3): "))
@@ -164,3 +166,99 @@ for nombre, es_sub in subconjunto_resultados:
 superconjunto_resultados = conjunto_a.es_superconjunto(conjunto_b)
 for nombre, es_super in superconjunto_resultados:
     print(f"{conjunto_a.nombre} es superconjunto de {nombre}: {es_super}")
+
+
+def crear_diagrama_venn(conjuntos):
+    """
+    Crea un diagrama de Venn para 2 o 3 conjuntos, mostrando los valores del conjunto, evidenciando
+    principalmente la intersección en rojo.
+    """
+
+    num_conjuntos = len(conjuntos)
+    if num_conjuntos == 2:
+        # Para 2 conjuntos
+        set_a = set(conjuntos[0].conjunto)
+        set_b = set(conjuntos[1].conjunto)
+        interseccion = set_a & set_b
+        solo_a = set_a - interseccion
+        solo_b = set_b - interseccion
+
+        # Crear la representación del diagrama de Venn
+        venn = venn2(subsets={'10': len(solo_a), '01': len(solo_b), '11': len(interseccion)},
+                     set_labels=(conjuntos[0].nombre, conjuntos[1].nombre),
+                     set_colors=('lightblue', 'lightgreen'),
+                     alpha=0.7)
+
+        # Resaltar la intersección en rojo
+        if venn.get_patch_by_id('11'):
+            venn.get_patch_by_id('11').set_color('red')
+            venn.get_patch_by_id('11').set_alpha(0.4)
+
+        # Establecer los textos, incluso si las áreas están vacías
+        if venn.get_label_by_id('10'):
+            venn.get_label_by_id('10').set_text(', '.join(solo_a))
+        if venn.get_label_by_id('01'):
+            venn.get_label_by_id('01').set_text(', '.join(solo_b))
+        if venn.get_label_by_id('11'):
+            venn.get_label_by_id('11').set_text(', '.join(interseccion))
+
+        plt.title("Diagrama de Venn de 2 Conjuntos")
+
+    elif num_conjuntos == 3:
+        # Para 3 conjuntos
+        set_a = set(conjuntos[0].conjunto)
+        set_b = set(conjuntos[1].conjunto)
+        set_c = set(conjuntos[2].conjunto)
+        interseccion_ab = set_a & set_b
+        interseccion_ac = set_a & set_c
+        interseccion_bc = set_b & set_c
+        interseccion_abc = set_a & set_b & set_c
+        solo_a = set_a - (interseccion_ab | interseccion_ac | interseccion_abc)
+        solo_b = set_b - (interseccion_ab | interseccion_bc | interseccion_abc)
+        solo_c = set_c - (interseccion_ac | interseccion_bc | interseccion_abc)
+
+        # Crear la representación del diagrama de Venn
+        venn = venn3(subsets={'100': len(solo_a), '010': len(solo_b), '001': len(solo_c),
+                              '110': len(interseccion_ab - interseccion_abc),
+                              '101': len(interseccion_ac - interseccion_abc),
+                              '011': len(interseccion_bc - interseccion_abc),
+                              '111': len(interseccion_abc)},
+                     set_labels=(conjuntos[0].nombre, conjuntos[1].nombre, conjuntos[2].nombre),
+                     set_colors=('lightblue', 'lightgreen', 'lightyellow'),
+                     alpha=0.7)
+
+        # Resaltar la intersección de los 3 conjuntos en rojo
+        if venn.get_patch_by_id('111'):
+            venn.get_patch_by_id('111').set_color('red')
+            venn.get_patch_by_id('111').set_alpha(1)
+
+        # Establecer los textos, incluso si las áreas están vacías
+        ids = ['100', '010', '001', '110', '101', '011', '111']
+        textos = [
+            ', '.join(solo_a),
+            ', '.join(solo_b),
+            ', '.join(solo_c),
+            ', '.join(interseccion_ab - interseccion_abc),
+            ', '.join(interseccion_ac - interseccion_abc),
+            ', '.join(interseccion_bc - interseccion_abc),
+            ', '.join(interseccion_abc)
+        ]
+
+        for id, texto in zip(ids, textos):
+            if venn.get_label_by_id(id):
+                venn.get_label_by_id(id).set_text(texto)
+
+        plt.title("Diagrama de Venn de 3 Conjuntos")
+
+    else:
+        print("Número de conjuntos inválido. Se necesita 2 o 3 conjuntos.")
+        return
+
+    plt.show()
+
+# Crear la lista de objetos Conjunto para usar en la función
+conjuntos_venn = [conjunto_a, conjunto_b]
+if conjunto_c:
+    conjuntos_venn.append(conjunto_c)
+
+crear_diagrama_venn(conjuntos_venn)
