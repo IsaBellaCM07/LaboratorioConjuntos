@@ -48,11 +48,6 @@ class Conjunto:
                     interseccion.remove(elemento)
             return interseccion  # Retorna el conjunto resultante de la intersección.
 
-        # Si solo se ha pasado un conjunto (es decir, `self`), no puede haber intersección con otros conjuntos.
-        if len(conjuntos) == 1:
-            print(f"Intersección de {self.nombre}: {self.conjunto}")  # Imprime los elementos del único conjunto.
-            return  # Finaliza la ejecución de la función, ya que no hay más conjuntos.
-
         # Si se han pasado al menos dos conjuntos, se comienzan a calcular las intersecciones.
         # Se hacen todas las combinaciones posibles de intersecciones entre pares de conjuntos.
         for i in range(len(conjuntos)):  # Itera sobre todos los conjuntos en la lista.
@@ -66,17 +61,13 @@ class Conjunto:
 
         # Si hay más de dos conjuntos, también se calcula la intersección total entre todos ellos.
         if len(conjuntos) > 2:
-            # Comenzamos con una copia del conjunto actual (`self`) como base de la intersección total.
-            conjunto_interseccion_total = self.conjunto.copy()
-            # Iteramos sobre los conjuntos adicionales y los vamos intersectando uno por uno.
-            for conjunto_adicional in otros_conjuntos:
-                conjunto_interseccion_total = calcular_interseccion(Conjunto(conjunto_interseccion_total),
-                                                                    conjunto_adicional)
-
-            # Genera una cadena con los nombres de todos los conjuntos involucrados en la intersección total.
-            nombres_conjuntos_total = " ∩ ".join([conjunto.nombre for conjunto in conjuntos])
-            # Imprime la intersección total de todos los conjuntos.
-            print(f"Intersección de {nombres_conjuntos_total}: {conjunto_interseccion_total}")
+            conjunto_interseccion = self.conjunto.copy()  # Crea una copia del conjunto actual
+            for conjunto_adicional in otros_conjuntos:  # Itera sobre los conjuntos adicionales
+                for elemento in conjunto_interseccion.copy():  # Itera sobre los elementos del conjunto intersección
+                    if elemento not in conjunto_adicional.conjunto:  # Si el elemento no está en el conjunto adicional
+                        conjunto_interseccion.remove(elemento)  # Lo elimina del conjunto intersección
+            nombres_conjuntos = ", ".join([self.nombre] + [conjunto.nombre for conjunto in otros_conjuntos])
+            print(f"Intersección de {nombres_conjuntos}: {conjunto_interseccion}")
 
     def diferencia(self, *otros_conjuntos):
         """
