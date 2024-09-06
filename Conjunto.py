@@ -89,15 +89,16 @@ class Conjunto:
         Un elemento solo permanece si no está en todos los conjuntos.
         Devuelve un nuevo objeto Conjunto con la diferencia simétrica final.
         """
+
         conjunto_diferencia_simetrica = self.conjunto.copy()  # Crea una copia del conjunto actual
         # Inicializa un diccionario para contar las repeticiones de cada elemento
-        contador_repeticiones = {elemento: 1 for elemento in self.conjunto}
+        contador_repeticiones = {elemento: 1 for elemento in self.conjunto} # contador_repeticiones = {'1': 1, '2': 1, '3': 1}
 
         # Itera sobre los conjuntos adicionales
         for conjunto_adicional in otros_conjuntos:
             for elemento in conjunto_adicional.conjunto:  # Itera sobre los elementos del conjunto adicional
                 if elemento in conjunto_diferencia_simetrica:  # Si el elemento ya está en el conjunto diferencia_simétrica
-                    contador_repeticiones[elemento] += 1  # Incrementa su contador
+                    contador_repeticiones[elemento] += 1  # Incrementa su contador A = [1,2,3,] B = [ 1,4,5] / Copia A = [1,2,3,4,5]
                 else:
                     conjunto_diferencia_simetrica.append(elemento)  # Si no está, lo agrega al conjunto diferencia_simétrica
                     contador_repeticiones[elemento] = 1  # Inicializa su contador en 1
